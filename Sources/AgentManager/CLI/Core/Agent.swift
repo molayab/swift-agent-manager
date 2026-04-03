@@ -38,3 +38,23 @@ func resolveTargets(_ filterAgents: [String]) -> [Agent]? {
         return agent
     }
 }
+
+/// Resolves agents to operate on, prompting interactively when no filter is given.
+/// Returns `nil` — and prints an appropriate message — when there is nothing to do.
+func selectAgentTargets(filter: [String]) -> [Agent]? {
+    if filter.isEmpty {
+        let detected = detectedAgents()
+        guard !detected.isEmpty else {
+            warn("No agents detected on this machine.")
+            info("Use --agent <id>. Available: \(allAgents.map(\.id).joined(separator: ", "))")
+            return nil
+        }
+        return selectInteractive(prompt: "Select agents", items: detected, display: \.name)
+    }
+    let resolved = resolveTargets(filter) ?? []
+    guard !resolved.isEmpty else {
+        fail("No agents selected.")
+        return nil
+    }
+    return resolved
+}

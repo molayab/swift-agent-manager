@@ -31,17 +31,12 @@ struct CommandPrivate: ParsableCommand {
     }
 
     private func updateSymlinks(for cmd: UserCommandModel, newFile: URL) {
-        let markdownAgents = CommandModel.allCommandAgents.filter { $0.format == .markdown }
-        for agent in markdownAgents {
-            let dest = agent.path.appendingPathComponent("\(cmd.id).md")
-            guard isSymlink(dest) else { continue }
-            do {
-                try fm.removeItem(at: dest)
-                try fm.createSymbolicLink(at: dest, withDestinationURL: newFile)
-                info("  Updated symlink → \(agent.name)")
-            } catch {
-                warn("  Could not update symlink in \(agent.name): \(error.localizedDescription)")
-            }
-        }
+        relinkSymlinks(
+            agents: CommandModel.allCommandAgents
+                .filter { $0.format == .markdown }
+                .map { (path: $0.path, name: $0.name) },
+            childName: "\(cmd.id).md",
+            to: newFile
+        )
     }
 }

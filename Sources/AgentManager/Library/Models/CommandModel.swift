@@ -60,4 +60,24 @@ struct CommandModel {
             return agent
         }
     }
+
+    /// Resolves agents to operate on, prompting interactively when no filter is given.
+    /// Returns `nil` — and prints an appropriate message — when there is nothing to do.
+    static func selectTargets(_ ids: [String]) -> [CommandModel]? {
+        if ids.isEmpty {
+            let detected = detectedCommandAgents()
+            guard !detected.isEmpty else {
+                warn("No command agents detected.")
+                info("Use --agent <id>. Available: \(allCommandAgents.map(\.id).joined(separator: ", "))")
+                return nil
+            }
+            return selectInteractive(prompt: "Select agents", items: detected, display: \.name)
+        }
+        let resolved = resolveCommandAgents(ids) ?? []
+        guard !resolved.isEmpty else {
+            fail("No agents selected.")
+            return nil
+        }
+        return resolved
+    }
 }

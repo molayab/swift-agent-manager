@@ -27,23 +27,7 @@ struct SkillDeactivate: ParsableCommand {
             return
         }
 
-        let targets: [Agent]
-        if filter.agent.isEmpty {
-            let detected = detectedAgents()
-            guard !detected.isEmpty else {
-                warn("No agents detected on this machine.")
-                info("Use --agent <id>. Available: \(allAgents.map(\.id).joined(separator: ", "))")
-                return
-            }
-            targets = selectInteractive(prompt: "Select agents", items: detected, display: \.name)
-        } else {
-            guard let resolvedTargets = resolveTargets(filter.agent) else {
-                return
-            }
-            targets = resolvedTargets
-        }
-        guard !targets.isEmpty else {
-            fail("No agents selected.")
+        guard let targets = selectAgentTargets(filter: filter.agent) else {
             return
         }
 

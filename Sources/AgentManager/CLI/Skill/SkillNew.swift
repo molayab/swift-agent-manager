@@ -11,11 +11,7 @@ struct SkillNew: ParsableCommand {
     var name: String
 
     func run() throws {
-        let slug = name
-            .lowercased()
-            .replacingOccurrences(of: " ", with: "-")
-            .filter { $0.isLetter || $0.isNumber || $0 == "-" }
-
+        let slug = makeSlug(from: name)
         guard !slug.isEmpty else { throw ValidationError("Provide a valid skill name.") }
 
         let dest = skillsDir.appendingPathComponent(slug)

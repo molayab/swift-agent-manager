@@ -31,23 +31,7 @@ struct CommandDeactivate: ParsableCommand {
             return
         }
 
-        let targets: [CommandModel]
-        if agent.isEmpty {
-            let detected = CommandModel.detectedCommandAgents()
-            guard !detected.isEmpty else {
-                warn("No command agents detected.")
-                info("Use --agent <id>. Available: \(CommandModel.allCommandAgents.map(\.id).joined(separator: ", "))")
-                return
-            }
-            targets = selectInteractive(prompt: "Select agents", items: detected, display: \.name)
-        } else {
-            guard let resolvedTargets = CommandModel.resolveCommandAgents(agent) else {
-                return
-            }
-            targets = resolvedTargets
-        }
-        guard !targets.isEmpty else {
-            fail("No agents selected.")
+        guard let targets = CommandModel.selectTargets(agent) else {
             return
         }
 

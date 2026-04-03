@@ -31,16 +31,10 @@ struct SkillPrivate: ParsableCommand {
     }
 
     private func updateSymlinks(for skill: SkillModel, newDir: URL) {
-        for agent in allAgents {
-            let dest = agent.path.appendingPathComponent(skill.id)
-            guard isSymlink(dest) else { continue }
-            do {
-                try fm.removeItem(at: dest)
-                try fm.createSymbolicLink(at: dest, withDestinationURL: newDir)
-                info("  Updated symlink → \(agent.name)")
-            } catch {
-                warn("  Could not update symlink in \(agent.name): \(error.localizedDescription)")
-            }
-        }
+        relinkSymlinks(
+            agents: allAgents.map { (path: $0.path, name: $0.name) },
+            childName: skill.id,
+            to: newDir
+        )
     }
 }
