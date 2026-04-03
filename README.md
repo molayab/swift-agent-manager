@@ -58,7 +58,7 @@ Modern development involves several AI coding agents — OpenCode, Claude Code, 
 ### Option A — one-liner (no clone required)
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/molayab/swift-agent-manager/main/quickinstall.sh | bash
+curl -fsSL https://raw.githubusercontent.com/molayab/swift-agent-manager/main/quickinstall.py | python3
 ```
 
 The script sets up everything from scratch — no existing repo or Swift toolchain needed:
@@ -81,13 +81,13 @@ git push -u origin main
 
 ```sh
 # Install binary to /usr/local/bin as well
-curl -fsSL https://raw.githubusercontent.com/molayab/swift-agent-manager/main/quickinstall.sh | bash -s -- --global
+curl -fsSL https://raw.githubusercontent.com/molayab/swift-agent-manager/main/quickinstall.py | python3 - --global
 
 # Pin to a specific release
-curl -fsSL https://raw.githubusercontent.com/molayab/swift-agent-manager/main/quickinstall.sh | bash -s -- --version 1.0.5 --global
+curl -fsSL https://raw.githubusercontent.com/molayab/swift-agent-manager/main/quickinstall.py | python3 - --version 1.0.5 --global
 
 # Custom repo directory
-curl -fsSL https://raw.githubusercontent.com/molayab/swift-agent-manager/main/quickinstall.sh | bash -s -- --dir ~/my-agents
+curl -fsSL https://raw.githubusercontent.com/molayab/swift-agent-manager/main/quickinstall.py | python3 - --dir ~/my-agents
 ```
 
 ### Option B — clone and install
@@ -102,31 +102,31 @@ cd ~/agent-manager
 **Download a pre-compiled binary** (no Swift toolchain required):
 
 ```sh
-bash install.sh --binary            # install to ./bin/
-bash install.sh --binary --global   # install to /usr/local/bin
-bash install.sh --binary --version 1.0.4 --global
+python3 install.py --binary            # install to ./bin/
+python3 install.py --binary --global   # install to /usr/local/bin
+python3 install.py --binary --version 1.0.4 --global
 ```
 
 **Build from source** (requires Swift 6.2):
 
 ```sh
-bash install.sh            # install to ./bin/
-bash install.sh --global   # install to /usr/local/bin
+python3 install.py            # install to ./bin/
+python3 install.py --global   # install to /usr/local/bin
 ```
 
 Examples throughout this README assume a global install. If you installed locally, replace `agent-manager` with `./bin/agent-manager`.
 
 ### How the binary locates the repo
 
-After a successful install, `install.sh` writes the repo path to `~/.config/agent-manager/repo`. The binary reads this file at runtime so it always knows where `skills/` and `commands/` live, regardless of your working directory.
+After a successful install, `install.py` writes the repo path to `~/.config/agent-manager/repo`. The binary reads this file at runtime so it always knows where `skills/` and `commands/` live, regardless of your working directory.
 
 Resolution order:
 
 1. `AGENT_MANAGER_REPO` environment variable — useful in CI or when managing multiple repos
-2. `~/.config/agent-manager/repo` — written automatically by `install.sh`
+2. `~/.config/agent-manager/repo` — written automatically by `install.py`
 3. Walk up from the current directory looking for `Package.swift` — fallback for `swift run` / development
 
-If you ever move the repo, re-run `install.sh` to update the config file, or set `AGENT_MANAGER_REPO` to the new path:
+If you ever move the repo, re-run `install.py` to update the config file, or set `AGENT_MANAGER_REPO` to the new path:
 
 ```sh
 export AGENT_MANAGER_REPO=~/new-location/agent-manager
