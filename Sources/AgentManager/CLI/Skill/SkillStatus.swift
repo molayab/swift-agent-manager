@@ -3,6 +3,7 @@ import Foundation
 
 struct SkillStatus: ParsableCommand {
     static let configuration = CommandConfiguration(
+        commandName: "status",
         abstract: "Show activation status per agent."
     )
 
