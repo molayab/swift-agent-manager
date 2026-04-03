@@ -31,7 +31,12 @@ func selectInteractive<T>(prompt: String, items: [T], display: (T) -> String) ->
     }
     print()
     print("\(bold)>\(reset) ", terminator: "")
+    #if canImport(Glibc)
+    nonisolated(unsafe) let _stdout = stdout
+    fflush(_stdout)
+    #else
     fflush(stdout)
+    #endif
 
     let input = (readLine() ?? "").trimmingCharacters(in: .whitespaces)
     guard !input.isEmpty, input.lowercased() != "all" else {

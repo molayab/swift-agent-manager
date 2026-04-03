@@ -19,7 +19,7 @@ struct UserCommandModel {
                 let stem = file.deletingPathExtension().lastPathComponent  // "review" or "review.private"
                 let privateFile = stem.hasSuffix(".private")
                 let cmdID = privateFile ? String(stem.dropLast(".private".count)) : stem
-                let text = (try? String(contentsOf: file)) ?? ""
+                let text = (try? String(contentsOf: file, encoding: .utf8)) ?? ""
                 return UserCommandModel(
                     id: cmdID,
                     file: file,

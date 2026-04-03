@@ -21,7 +21,7 @@ struct SkillModel {
                 let dirName = dir.lastPathComponent
                 let privateDir = dirName.hasSuffix(".private")
                 let skillID = privateDir ? String(dirName.dropLast(".private".count)) : dirName
-                let text = (try? String(contentsOf: dir.appendingPathComponent("SKILL.md"))) ?? ""
+                let text = (try? String(contentsOf: dir.appendingPathComponent("SKILL.md"), encoding: .utf8)) ?? ""
                 return SkillModel(
                     id: skillID,
                     dir: dir,

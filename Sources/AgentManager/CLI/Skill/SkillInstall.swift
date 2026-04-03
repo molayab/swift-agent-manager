@@ -1,5 +1,8 @@
 import ArgumentParser
 import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 struct SkillInstall: AsyncParsableCommand {
     static let configuration = CommandConfiguration(

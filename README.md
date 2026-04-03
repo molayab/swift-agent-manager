@@ -2,7 +2,7 @@
 
 Manage AI agent skills and slash commands across every tool and machine from a single git repository.
 
-[![Platform](https://img.shields.io/badge/platform-macOS%2013%2B-lightgrey)](https://www.apple.com/macos/)
+[![Platform](https://img.shields.io/badge/platform-macOS%2013%2B%20%7C%20Linux-lightgrey)](https://www.swift.org/)
 [![Swift](https://img.shields.io/badge/Swift-6.2-orange)](https://www.swift.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![CI](https://github.com/molayab/swift-agent-manager/actions/workflows/ci.yml/badge.svg)](https://github.com/molayab/swift-agent-manager/actions/workflows/ci.yml)
@@ -44,23 +44,42 @@ Modern development involves several AI coding agents — OpenCode, Claude Code, 
 
 ## Prerequisites
 
-- macOS 13 or later
-- Swift 6.2 — bundled with [Xcode 26+](https://developer.apple.com/xcode/) or installable via the [Swift toolchain](https://www.swift.org/install/)
+- macOS 13 or later, or Linux (Ubuntu 22.04+)
+- Swift 6.2 — only required when **building from source**; pre-compiled binaries need no toolchain
+  - macOS: bundled with [Xcode 26+](https://developer.apple.com/xcode/) or the [Swift toolchain](https://www.swift.org/install/)
+  - Linux: install via the [Swift toolchain](https://www.swift.org/install/)
 
 ---
 
 ## Installation
 
-Clone your fork (or this repo) and build the binary:
+Clone your fork (or this repo), then choose how to install:
 
 ```sh
 git clone https://github.com/<you>/agent-manager ~/agent-manager
 cd ~/agent-manager
+```
 
-# Install to ./bin/agent-manager (local)
+**Option A — download a pre-compiled binary** (no Swift toolchain required):
+
+```sh
+# Latest release, install to ./bin/
+bash install.sh --binary
+
+# Latest release, install system-wide
+bash install.sh --binary --global
+
+# Pin to a specific release tag
+bash install.sh --binary --version 1.0.2 --global
+```
+
+**Option B — build from source** (requires Swift 6.2):
+
+```sh
+# Install to ./bin/agent-manager
 bash install.sh
 
-# Or install to /usr/local/bin/agent-manager (available system-wide)
+# Install to /usr/local/bin/agent-manager (system-wide)
 bash install.sh --global
 ```
 
