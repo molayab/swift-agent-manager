@@ -3,10 +3,20 @@ import Foundation
 enum GitRunner {
     @discardableResult
     static func run(_ args: String...) -> (output: String, exitCode: Int32) {
+        runIn(repoRoot, args)
+    }
+
+    @discardableResult
+    static func runIn(_ directory: URL, _ args: String...) -> (output: String, exitCode: Int32) {
+        runIn(directory, args)
+    }
+
+    @discardableResult
+    private static func runIn(_ directory: URL, _ args: [String]) -> (output: String, exitCode: Int32) {
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/usr/bin/env")
         process.arguments = ["git"] + args
-        process.currentDirectoryURL = repoRoot
+        process.currentDirectoryURL = directory
 
         let pipe    = Pipe()
         let errPipe = Pipe()
