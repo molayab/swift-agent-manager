@@ -24,6 +24,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Stamp version from tag
+        run: |
+          sed -i.bak "s/version: \"[^\"]*\"/version: \"${{ github.ref_name }}\"/" Sources/AgentManager/App.swift
+          rm -f Sources/AgentManager/App.swift.bak
+
       - name: Build
         run: swift build -c release --product agent-manager ${{ matrix.swift-args }}
 
@@ -51,6 +56,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Stamp version from tag
+        run: |
+          sed -i.bak "s/version: \"[^\"]*\"/version: \"${{ github.ref_name }}\"/" Sources/AgentManager/App.swift
+          rm -f Sources/AgentManager/App.swift.bak
 
       - name: Build
         run: swift build -c release --product agent-manager
