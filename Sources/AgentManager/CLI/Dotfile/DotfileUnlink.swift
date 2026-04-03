@@ -31,8 +31,8 @@ struct DotfileUnlink: ParsableCommand {
         print("\n\(bold)Unlinking \(selected.count) dotfile(s)\(reset)"
             + (dryRun ? "  \(yellow)(dry run)\(reset)" : "") + "\n")
 
-        for d in selected {
-            try unlinkDotfile(d)
+        for dotfileItem in selected {
+            try unlinkDotfile(dotfileItem)
         }
     }
 

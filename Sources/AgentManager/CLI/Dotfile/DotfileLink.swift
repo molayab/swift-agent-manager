@@ -31,8 +31,8 @@ struct DotfileLink: ParsableCommand {
         print("\n\(bold)Linking \(selected.count) dotfile(s)\(reset)"
             + (dryRun ? "  \(yellow)(dry run)\(reset)" : "") + "\n")
 
-        for d in selected {
-            try linkDotfile(d)
+        for dotfileItem in selected {
+            try linkDotfile(dotfileItem)
         }
     }
 

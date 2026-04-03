@@ -49,8 +49,8 @@ struct DotfileModel {
                 }
 
                 let fileName: String
-                if let f = Frontmatter.yamlField("file", in: text), !f.isEmpty {
-                    fileName = f
+                if let file = Frontmatter.yamlField("file", in: text), !file.isEmpty {
+                    fileName = file
                 } else {
                     fileName = URL(fileURLWithPath: link).lastPathComponent
                 }

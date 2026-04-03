@@ -12,38 +12,43 @@ struct DotfileImport: ParsableCommand {
 
     // ── Well-known dotfiles ───────────────────────────────────────────────────
 
-    /// (link target relative to ~, suggested slug, human-readable name)
-    private static let knownDotfiles: [(link: String, slug: String, name: String)] = [
+    private struct KnownDotfile {
+        let link: String
+        let slug: String
+        let name: String
+    }
+
+    private static let knownDotfiles: [KnownDotfile] = [
         // Shell
-        ("~/.zshrc",              "zshrc",            "Zsh RC"),
-        ("~/.zprofile",           "zprofile",         "Zsh Profile"),
-        ("~/.zsh_profile",        "zsh-profile",      "Zsh Profile (alt)"),
-        ("~/.bashrc",             "bashrc",           "Bash RC"),
-        ("~/.bash_profile",       "bash-profile",     "Bash Profile"),
-        ("~/.profile",            "profile",          "Shell Profile"),
+        .init(link: "~/.zshrc", slug: "zshrc", name: "Zsh RC"),
+        .init(link: "~/.zprofile", slug: "zprofile", name: "Zsh Profile"),
+        .init(link: "~/.zsh_profile", slug: "zsh-profile", name: "Zsh Profile (alt)"),
+        .init(link: "~/.bashrc", slug: "bashrc", name: "Bash RC"),
+        .init(link: "~/.bash_profile", slug: "bash-profile", name: "Bash Profile"),
+        .init(link: "~/.profile", slug: "profile", name: "Shell Profile"),
         // Git
-        ("~/.gitconfig",          "gitconfig",        "Git Config"),
-        ("~/.gitignore_global",   "gitignore-global", "Git Global Ignore"),
+        .init(link: "~/.gitconfig", slug: "gitconfig", name: "Git Config"),
+        .init(link: "~/.gitignore_global", slug: "gitignore-global", name: "Git Global Ignore"),
         // Editors
-        ("~/.vimrc",              "vimrc",            "Vim RC"),
-        ("~/.nanorc",             "nanorc",           "Nano RC"),
-        ("~/.editorconfig",       "editorconfig",     "EditorConfig"),
+        .init(link: "~/.vimrc", slug: "vimrc", name: "Vim RC"),
+        .init(link: "~/.nanorc", slug: "nanorc", name: "Nano RC"),
+        .init(link: "~/.editorconfig", slug: "editorconfig", name: "EditorConfig"),
         // Terminal multiplexers
-        ("~/.tmux.conf",          "tmux-conf",        "tmux Config"),
-        ("~/.screenrc",           "screenrc",         "GNU Screen RC"),
+        .init(link: "~/.tmux.conf", slug: "tmux-conf", name: "tmux Config"),
+        .init(link: "~/.screenrc", slug: "screenrc", name: "GNU Screen RC"),
         // Terminal emulators
-        ("~/.wezterm.lua",        "wezterm",          "WezTerm Config"),
-        ("~/.alacritty.toml",     "alacritty",        "Alacritty Config"),
-        ("~/.config/alacritty/alacritty.toml", "alacritty", "Alacritty Config"),
-        ("~/.config/kitty/kitty.conf",         "kitty",     "Kitty Config"),
+        .init(link: "~/.wezterm.lua", slug: "wezterm", name: "WezTerm Config"),
+        .init(link: "~/.alacritty.toml", slug: "alacritty", name: "Alacritty Config"),
+        .init(link: "~/.config/alacritty/alacritty.toml", slug: "alacritty", name: "Alacritty Config"),
+        .init(link: "~/.config/kitty/kitty.conf", slug: "kitty", name: "Kitty Config"),
         // Prompt / shell tools
-        ("~/.config/starship/starship.toml",   "starship",  "Starship Prompt"),
-        ("~/.config/fish/config.fish",         "fish",      "Fish Shell Config"),
+        .init(link: "~/.config/starship/starship.toml", slug: "starship", name: "Starship Prompt"),
+        .init(link: "~/.config/fish/config.fish", slug: "fish", name: "Fish Shell Config"),
         // Misc
-        ("~/.ssh/config",         "ssh-config",       "SSH Config"),
-        ("~/.curlrc",             "curlrc",           "curl RC"),
-        ("~/.npmrc",              "npmrc",            "npm RC"),
-        ("~/.config/gh/config.yml", "gh-config",     "GitHub CLI Config"),
+        .init(link: "~/.ssh/config", slug: "ssh-config", name: "SSH Config"),
+        .init(link: "~/.curlrc", slug: "curlrc", name: "curl RC"),
+        .init(link: "~/.npmrc", slug: "npmrc", name: "npm RC"),
+        .init(link: "~/.config/gh/config.yml", slug: "gh-config", name: "GitHub CLI Config")
     ]
 
     // ── Candidate ─────────────────────────────────────────────────────────────
@@ -109,13 +114,7 @@ struct DotfileImport: ParsableCommand {
         }
 
         if link {
-            print()
-            info("Creating symlinks…")
-            let dotfiles = DotfileModel.loadDotfiles()
-            for candidate in selected {
-                guard let dotfile = dotfiles.first(where: { $0.id == candidate.slug }) else { continue }
-                try linkDotfile(dotfile)
-            }
+            try linkImported(selected)
         } else {
             print()
             info("Run  \(bold)agent-manager dotfile link\(reset)  to activate symlinks.")
@@ -123,6 +122,16 @@ struct DotfileImport: ParsableCommand {
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
+
+    private func linkImported(_ selected: [Candidate]) throws {
+        print()
+        info("Creating symlinks…")
+        let dotfiles = DotfileModel.loadDotfiles()
+        for candidate in selected {
+            guard let dotfile = dotfiles.first(where: { $0.id == candidate.slug }) else { continue }
+            try linkDotfile(dotfile)
+        }
+    }
 
     private func importCandidate(_ candidate: Candidate) throws {
         let destDir = dotfilesDir.appendingPathComponent(candidate.slug)
