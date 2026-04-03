@@ -5,51 +5,68 @@ on:
     tags:
       - '*'
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
-  build:
-    name: Build ${{ matrix.os-name }}-${{ matrix.arch }}
-    runs-on: ${{ matrix.runner }}
+  build-macos:
+    name: Build macos-${{ matrix.arch }}
+    runs-on: macos-15
     strategy:
       fail-fast: false
       matrix:
         include:
-          - runner: macos-15
-            os-name: macos
-            arch: arm64
-          - runner: macos-13
-            os-name: macos
-            arch: x86_64
+          - arch: arm64
+            swift-args: ''
+          - arch: x86_64
+            swift-args: '--arch x86_64'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build
+        run: swift build -c release --product agent-manager ${{ matrix.swift-args }}
+
+      - name: Stage binary
+        run: cp .build/release/agent-manager agent-manager-macos-${{ matrix.arch }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: agent-manager-macos-${{ matrix.arch }}
+          path: agent-manager-macos-${{ matrix.arch }}
+
+  build-linux:
+    name: Build linux-${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+    container: swift:6.2
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
           - runner: ubuntu-latest
-            os-name: linux
             arch: x86_64
           - runner: ubuntu-24.04-arm
-            os-name: linux
             arch: arm64
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Swift
-        if: runner.os == 'Linux'
-        uses: swift-actions/setup-swift@v2
-        with:
-          swift-version: '6.2'
-
       - name: Build
         run: swift build -c release --product agent-manager
 
       - name: Stage binary
-        run: cp .build/release/agent-manager agent-manager-${{ matrix.os-name }}-${{ matrix.arch }}
+        run: cp .build/release/agent-manager agent-manager-linux-${{ matrix.arch }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: agent-manager-${{ matrix.os-name }}-${{ matrix.arch }}
-          path: agent-manager-${{ matrix.os-name }}-${{ matrix.arch }}
+          name: agent-manager-linux-${{ matrix.arch }}
+          path: agent-manager-linux-${{ matrix.arch }}
 
   release:
     name: Publish GitHub Release
-    needs: build
+    needs: [build-macos, build-linux]
     runs-on: ubuntu-latest
     permissions:
       contents: write
