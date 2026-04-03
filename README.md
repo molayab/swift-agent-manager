@@ -23,6 +23,7 @@ Modern development involves several AI coding agents — OpenCode, Claude Code, 
 
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
+  - [How the binary locates the repo](#how-the-binary-locates-the-repo)
 - [Quick Start](#quick-start)
 - [Repository Layout](#repository-layout)
 - [Adding Skills and Commands](#adding-skills-and-commands)
@@ -62,6 +63,22 @@ bash install.sh --global
 ```
 
 Examples throughout this README assume a global install. If you installed locally, replace `agent-manager` with `./bin/agent-manager`.
+
+### How the binary locates the repo
+
+After a successful install, `install.sh` writes the repo path to `~/.config/agent-manager/repo`. The binary reads this file at runtime so it always knows where `skills/` and `commands/` live, regardless of your working directory.
+
+Resolution order:
+
+1. `AGENT_MANAGER_REPO` environment variable — useful in CI or when managing multiple repos
+2. `~/.config/agent-manager/repo` — written automatically by `install.sh`
+3. Walk up from the current directory looking for `Package.swift` — fallback for `swift run` / development
+
+If you ever move the repo, re-run `install.sh` to update the config file, or set `AGENT_MANAGER_REPO` to the new path:
+
+```sh
+export AGENT_MANAGER_REPO=~/new-location/agent-manager
+```
 
 ---
 

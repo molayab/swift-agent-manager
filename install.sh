@@ -52,6 +52,14 @@ fi
 
 echo ""
 
+# ── write repo config (lets the binary find skills/commands after install) ──────
+write_repo_config() {
+    local config_dir="$HOME/.config/agent-manager"
+    mkdir -p "$config_dir"
+    echo "$SCRIPT_DIR" > "$config_dir/repo"
+    ok "Repo path saved to ${bold}~/.config/agent-manager/repo${reset}"
+}
+
 # ── install ────────────────────────────────────────────────────────────────────
 if $GLOBAL; then
     DEST="$GLOBAL_BIN/agent-manager"
@@ -66,12 +74,14 @@ if $GLOBAL; then
         sudo chmod +x "$DEST"
     fi
 
+    write_repo_config
     ok "Installed.  Run: ${bold}agent-manager${reset}"
 else
     mkdir -p "$SCRIPT_DIR/bin"
     DEST="$SCRIPT_DIR/bin/agent-manager"
     cp "$BINARY" "$DEST"
     chmod +x "$DEST"
+    write_repo_config
     ok "Installed.  Run: ${bold}./bin/agent-manager${reset}"
     info "Or add ${bold}$(realpath bin)${reset} to your PATH to run as ${bold}agent-manager${reset}"
 fi
