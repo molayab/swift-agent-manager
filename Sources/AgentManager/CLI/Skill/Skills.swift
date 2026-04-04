@@ -9,6 +9,7 @@ struct Skills: ParsableCommand {
             SkillActivate.self,
             SkillDeactivate.self,
             SkillNew.self,
+            SkillImport.self,
             SkillStatus.self,
             SkillInstall.self,
             SkillPrivate.self

@@ -1,11 +1,11 @@
-// swift-tools-version: 6.0
+// swift-tools-version: 6.2
 import PackageDescription
 
 let package = Package(
     name: "agent-manager",
     platforms: [.macOS(.v13)],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.5.0")
+        .package(url: "https://github.com/apple/swift-argument-parser", exact: "1.7.1")
     ],
     targets: [
         .executableTarget(

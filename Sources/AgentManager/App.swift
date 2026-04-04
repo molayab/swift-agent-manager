@@ -8,12 +8,18 @@ struct CLI: AsyncParsableCommand {
         version: "1.0.6",
         subcommands: [
             Skills.self,
+            Commands.self,
+            Dotfiles.self,
             Sync.self,
             Repo.self,
             Push.self,
             Pull.self,
-            Commands.self,
             Clean.self
         ]
     )
+
+    mutating func run() throws {
+        print("\(bold)Repo:\(reset) \(gray)\(repoRoot.path)\(reset)\n")
+        throw CleanExit.helpRequest()
+    }
 }

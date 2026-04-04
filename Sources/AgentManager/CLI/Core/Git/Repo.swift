@@ -6,27 +6,31 @@ struct Repo: ParsableCommand {
         abstract: "Show git repository status, or initialise one."
     )
 
-    @Flag(name: .customLong("init"), help: "Initialise a git repository if one does not exist.")
-    var shouldInit = false
+    @Option(name: .customLong("init"), help: "Create a new repo at <path> and set it as active.")
+    var initPath: String?
+
+    @Option(name: .customLong("use"), help: "Switch the active repo to an existing path.")
+    var usePath: String?
 
     func run() throws {
+        if let initPath {
+            try initRepo(at: initPath)
+            return
+        }
+
+        if let usePath {
+            try switchRepo(to: usePath)
+            return
+        }
+
         let gitDir = repoRoot.appendingPathComponent(".git")
         let hasGit = fm.fileExists(atPath: gitDir.path)
 
         print("\n\(bold)Repository\(reset)  \(gray)\(repoRoot.path)\(reset)\n")
 
         if !hasGit {
-            if shouldInit {
-                let result = GitRunner.run("init")
-                if result.exitCode == 0 {
-                    ok("Initialised git repository.")
-                } else {
-                    fail("git init failed.")
-                }
-            } else {
-                warn("No git repository found.")
-                info("Run with --init to create one.")
-            }
+            warn("No git repository found.")
+            info("Run  agent-manager repo --init <path>  to create one.")
             print()
             return
         }
@@ -49,5 +53,62 @@ struct Repo: ParsableCommand {
         print("  \(bold)Status:\(reset)   \(statusText)")
 
         print()
+    }
+
+    private func initRepo(at path: String) throws {
+        let expanded = URL(fileURLWithPath: expandingTilde(in: path)).standardized
+
+        if !fm.fileExists(atPath: expanded.path) {
+            try fm.createDirectory(at: expanded, withIntermediateDirectories: true)
+            ok("Created  \(gray)\(expanded.path)\(reset)")
+        }
+
+        guard isDirectory(expanded) else {
+            fail("Path is not a directory: \(expanded.path)")
+            return
+        }
+
+        let gitDir = expanded.appendingPathComponent(".git")
+        if fm.fileExists(atPath: gitDir.path) {
+            warn("Git repository already exists at \(expanded.path)")
+        } else {
+            let result = GitRunner.runIn(expanded, "init")
+            if result.exitCode == 0 {
+                ok("Initialised git repository")
+            } else {
+                fail("git init failed.")
+                return
+            }
+        }
+
+        try writeRepoConfig(expanded)
+        ok("Active repo → \(bold)\(expanded.path)\(reset)")
+    }
+
+    private func switchRepo(to path: String) throws {
+        let expanded = URL(fileURLWithPath: expandingTilde(in: path)).standardized
+        guard fm.fileExists(atPath: expanded.path) else {
+            fail("Path does not exist: \(expanded.path)")
+            return
+        }
+        guard isDirectory(expanded) else {
+            fail("Path is not a directory: \(expanded.path)")
+            return
+        }
+        try writeRepoConfig(expanded)
+        ok("Active repo → \(bold)\(expanded.path)\(reset)")
+    }
+
+    private func writeRepoConfig(_ repoURL: URL) throws {
+        let configDir = home
+            .appendingPathComponent(".config")
+            .appendingPathComponent("agent-manager")
+        try fm.createDirectory(at: configDir, withIntermediateDirectories: true)
+        try repoURL.path.write(
+            to: configDir.appendingPathComponent("repo"),
+            atomically: true,
+            encoding: .utf8
+        )
+        ok("Config saved  \(gray)~/.config/agent-manager/repo\(reset)")
     }
 }

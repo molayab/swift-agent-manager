@@ -5,7 +5,7 @@ let home = URL(fileURLWithPath: NSHomeDirectory())
 
 /// Expands a leading `~` to the current user's home directory.
 /// Replaces `(str as NSString).expandingTildeInPath`, which requires the ObjC runtime.
-private func expandingTilde(in path: String) -> String {
+func expandingTilde(in path: String) -> String {
     guard path.hasPrefix("~") else {
         return path
     }
@@ -50,6 +50,7 @@ func findRepoRoot() -> URL {
 let repoRoot    = findRepoRoot()
 let skillsDir   = repoRoot.appendingPathComponent("skills")
 let commandsDir = repoRoot.appendingPathComponent("commands")
+let dotfilesDir = repoRoot.appendingPathComponent("dotfiles")
 
 func isSymlink(_ url: URL) -> Bool {
     (try? fm.destinationOfSymbolicLink(atPath: url.path)) != nil

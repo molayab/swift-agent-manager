@@ -60,25 +60,31 @@ struct CommandImport: ParsableCommand {
         let entries = try fm.contentsOfDirectory(
             at: resolvedPath,
             includingPropertiesForKeys: nil
-        ).filter { $0.pathExtension == "md" && !isSymlink($0) }
+        ).filter { $0.pathExtension == "md" }
 
         guard !entries.isEmpty else {
             info("  no .md files found")
             return
         }
 
-        for source in entries {
-            let dest = commandsDir.appendingPathComponent(source.lastPathComponent)
+        for entry in entries {
+            let source = entry.resolvingSymlinksInPath()
+            // Skip entries that are already tracked inside this repo
+            if source.path.hasPrefix(commandsDir.resolvingSymlinksInPath().path) {
+                skip("  /\(entry.deletingPathExtension().lastPathComponent)  \(gray)already in repo\(reset)")
+                continue
+            }
+            let dest = commandsDir.appendingPathComponent(entry.lastPathComponent)
             if fm.fileExists(atPath: dest.path) {
                 if force {
                     try fm.removeItem(at: dest)
                 } else {
-                    skip("  /\(source.deletingPathExtension().lastPathComponent)  \(gray)already in repo\(reset)")
+                    skip("  /\(entry.deletingPathExtension().lastPathComponent)  \(gray)already in repo\(reset)")
                     continue
                 }
             }
             try fm.copyItem(at: source, to: dest)
-            ok("  /\(source.deletingPathExtension().lastPathComponent)")
+            ok("  /\(entry.deletingPathExtension().lastPathComponent)")
         }
     }
 }
