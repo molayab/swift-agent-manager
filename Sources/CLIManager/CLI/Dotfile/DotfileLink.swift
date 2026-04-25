@@ -49,8 +49,8 @@ struct DotfileLink: ParsableCommand {
         let targetExists = fm.fileExists(atPath: target.path)
 
         if targetIsSymlink {
-            let dest = try? fm.destinationOfSymbolicLink(atPath: target.path)
-            if dest == source.path {
+            let dest = symlinkDestination(at: target)
+            if dest == source.standardized.path {
                 skip("  \(dotfile.id)  \(gray)already linked\(reset)")
                 return
             }

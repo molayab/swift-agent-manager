@@ -56,6 +56,29 @@ func isSymlink(_ url: URL) -> Bool {
     (try? fm.destinationOfSymbolicLink(atPath: url.path)) != nil
 }
 
+/// Returns the absolute, standardized path that `symlink` resolves to.
+/// `destinationOfSymbolicLink` can return a relative path; this resolves
+/// it against the symlink's parent directory before standardizing.
+func symlinkDestination(at symlink: URL) -> String? {
+    guard let dest = try? fm.destinationOfSymbolicLink(atPath: symlink.path) else { return nil }
+    if dest.hasPrefix("/") {
+        return URL(fileURLWithPath: dest).standardized.path
+    }
+    return symlink.deletingLastPathComponent()
+        .appendingPathComponent(dest)
+        .standardized.path
+}
+
+/// Returns true when `url` is located inside `ancestor`, verified by comparing
+/// path components rather than a raw string prefix. This prevents false matches
+/// on paths that share a common string prefix (e.g. `/repo` vs `/repo-fork`).
+func isDescendant(_ url: URL, of ancestor: URL) -> Bool {
+    let child  = url.standardized.pathComponents
+    let parent = ancestor.standardized.pathComponents
+    guard child.count > parent.count else { return false }
+    return child.prefix(parent.count).elementsEqual(parent)
+}
+
 func isDirectory(_ url: URL) -> Bool {
     (try? url.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true
 }

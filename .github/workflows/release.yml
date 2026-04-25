@@ -26,8 +26,8 @@ jobs:
 
       - name: Stamp version from tag
         run: |
-          sed -i.bak "s/version: \"[^\"]*\"/version: \"${{ github.ref_name }}\"/" Sources/CLIManager/App.swift
-          rm -f Sources/CLIManager/App.swift.bak
+          sed -i.bak "s/let buildVersion = \"[^\"]*\"/let buildVersion = \"${{ github.ref_name }}\"/" Sources/CLIManager/BuildVersion.swift
+          rm -f Sources/CLIManager/BuildVersion.swift.bak
 
       - name: Build
         run: swift build -c release --product cli-manager ${{ matrix.swift-args }}
@@ -59,8 +59,8 @@ jobs:
 
       - name: Stamp version from tag
         run: |
-          sed -i.bak "s/version: \"[^\"]*\"/version: \"${{ github.ref_name }}\"/" Sources/CLIManager/App.swift
-          rm -f Sources/CLIManager/App.swift.bak
+          sed -i.bak "s/let buildVersion = \"[^\"]*\"/let buildVersion = \"${{ github.ref_name }}\"/" Sources/CLIManager/BuildVersion.swift
+          rm -f Sources/CLIManager/BuildVersion.swift.bak
 
       - name: Build
         run: swift build -c release --product cli-manager

@@ -163,21 +163,21 @@ def install_from_github(version: str, local_install: bool, global_install: bool)
 
 # ── Build from source ──────────────────────────────────────────────────────────
 
-APP_SWIFT = SCRIPT_DIR / "Sources" / "CLIManager" / "App.swift"
-_VERSION_RE = re.compile(r'(version:\s*")([^"]+)(")')
+BUILD_VERSION_SWIFT = SCRIPT_DIR / "Sources" / "CLIManager" / "BuildVersion.swift"
+_VERSION_RE = re.compile(r'(let buildVersion\s*=\s*")([^"]+)(")')
 
 
 def stamp_version(build_date: str) -> str:
-    """Append build date to the version string in App.swift. Returns original text."""
-    original = APP_SWIFT.read_text()
+    """Append build date to the version string in BuildVersion.swift. Returns original text."""
+    original = BUILD_VERSION_SWIFT.read_text()
     stamped = _VERSION_RE.sub(lambda m: f'{m.group(1)}{m.group(2)} ({build_date}){m.group(3)}', original, count=1)
-    APP_SWIFT.write_text(stamped)
+    BUILD_VERSION_SWIFT.write_text(stamped)
     return original
 
 
 def restore_version(original: str) -> None:
-    """Restore App.swift to its original content."""
-    APP_SWIFT.write_text(original)
+    """Restore BuildVersion.swift to its original content."""
+    BUILD_VERSION_SWIFT.write_text(original)
 
 
 def install_from_source(local_install: bool, global_install: bool) -> None:

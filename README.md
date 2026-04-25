@@ -64,7 +64,7 @@ curl -fsSL https://raw.githubusercontent.com/molayab/swift-cli-manager/main/quic
 The script sets up everything from scratch — no existing repo or Swift toolchain needed:
 
 1. Downloads the pre-compiled binary for your platform
-2. Creates an **empty repo** at `~/.config/cli-manager/src/` with `skills/`, `commands/`, and a `.gitignore`
+2. Creates an **empty repo** at `~/.config/cli-manager/src/` with `skills/`, `commands/`, `dotfiles/`, and a `.gitignore`
 3. Runs `git init` and makes an initial commit (skipped if the directory is already a git repo)
 4. Installs the binary to `~/.config/cli-manager/src/bin/`
 5. Writes `~/.config/cli-manager/repo` so the binary knows where your repo lives

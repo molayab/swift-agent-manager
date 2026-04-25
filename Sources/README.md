@@ -47,7 +47,7 @@ cli-manager
 @main struct CLIManager: AsyncParsableCommand {
     static var configuration = CommandConfiguration(
         commandName: "cli-manager",
-        version: "1.0.6",
+        version: buildVersion,
         subcommands: [Skills.self, Commands.self, Sync.self, Repo.self, Push.self, Pull.self, Clean.self]
     )
 }
@@ -270,9 +270,9 @@ Request settings: 15-second timeout, `Accept: application/vnd.github+json`
 ## Build & Dependencies
 
 **`Package.swift`**
-- Swift tools: 6.0
+- Swift tools: 6.1
 - Platform: macOS 13+
-- Dependencies: [`swift-argument-parser`](https://github.com/apple/swift-argument-parser) ≥ 1.5.0
+- Dependencies: [`swift-argument-parser`](https://github.com/apple/swift-argument-parser) 1.7.1 (exact)
 - Single executable target: `cli-manager`
 
 **Version stamping** — A Xcode `Run Script` build phase replaces the `version:` string in `App.swift` with the current `git describe --tags` output before compilation.
@@ -284,7 +284,7 @@ Request settings: 15-second timeout, `Accept: application/vnd.github+json`
 | Source | Description |
 |---|---|
 | `$CLI_MANAGER_REPO` | Override the repository root path |
-| `~/.config/cli-manager/repo` | Persisted repo path written by `install.sh` |
+| `~/.config/cli-manager/repo` | Persisted repo path written by `install.py` or `cli-manager repo --init`/`--use` |
 | `$GITHUB_TOKEN` | GitHub API token for `skill install` |
 
 Binary installed to: `~/.config/cli-manager/bin/cli-manager`

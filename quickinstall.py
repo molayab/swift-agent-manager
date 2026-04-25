@@ -36,9 +36,10 @@ bin/
 # macOS
 .DS_Store
 
-# Private skills and commands (local only, never committed)
+# Private skills, commands, and dotfiles (local only, never committed)
 skills/*.private/
 commands/*.private.md
+dotfiles/*.private/
 """
 
 # ── Terminal colours ───────────────────────────────────────────────────────────
@@ -162,7 +163,7 @@ def download_binary(url: str, dest: Path) -> None:
 def create_repo_structure(install_dir: Path) -> None:
     info(f"Creating repo at {BOLD}{install_dir}{RESET}")
 
-    for subdir in ("skills", "commands", "bin"):
+    for subdir in ("skills", "commands", "dotfiles", "bin"):
         (install_dir / subdir).mkdir(parents=True, exist_ok=True)
 
     gitignore = install_dir / ".gitignore"

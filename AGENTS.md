@@ -28,9 +28,9 @@ The binary locates this repo via a 3-step fallback (in `FileManager+Helpers.swif
 `fm`, `home`, `repoRoot`, `skillsDir`, `commandsDir`, `dotfilesDir` — used throughout all CLI commands.
 
 ### CLI Structure (`Sources/CLIManager/CLI/`)
-- **`skill/`** — 8 subcommands: list, new, activate, deactivate, install, status, private
-- **`command/`** — 8 subcommands: list, new, activate, deactivate, import, status, private
-- **`dotfile/`** — 6 subcommands: list, link, unlink, new, status, private
+- **`skill/`** — 9 subcommands: list, new, activate, deactivate, install, import, status, private
+- **`command/`** — 7 subcommands: list, new, activate, deactivate, import, status, private
+- **`dotfile/`** — 7 subcommands: list, link, unlink, new, import, status, private
 - **`Core/`** — clean (dead symlinks), sync (copies→symlinks), git push/pull/repo init
 
 ### Models (`Sources/CLIManager/Library/Models/`)

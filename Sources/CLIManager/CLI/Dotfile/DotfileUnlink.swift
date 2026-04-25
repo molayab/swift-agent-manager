@@ -49,8 +49,8 @@ struct DotfileUnlink: ParsableCommand {
         }
 
         // Only remove symlinks that point into this repo
-        if let dest = try? fm.destinationOfSymbolicLink(atPath: target.path),
-           !dest.hasPrefix(repoRoot.path) {
+        if let dest = symlinkDestination(at: target),
+           !isDescendant(URL(fileURLWithPath: dest), of: repoRoot) {
             warn("  \(dotfile.id)  symlink points outside repo (\(dest)) — skipping for safety")
             return
         }

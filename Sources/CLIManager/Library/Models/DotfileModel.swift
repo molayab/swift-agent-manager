@@ -21,10 +21,8 @@ struct DotfileModel {
 
     /// True if a symlink at `linkTarget` exists and points into this repo.
     var isLinked: Bool {
-        guard isSymlink(linkTarget),
-              let dest = try? fm.destinationOfSymbolicLink(atPath: linkTarget.path)
-        else { return false }
-        return dest.hasPrefix(repoRoot.path)
+        guard let dest = symlinkDestination(at: linkTarget) else { return false }
+        return isDescendant(URL(fileURLWithPath: dest), of: repoRoot)
     }
 
     static func loadDotfiles() -> [DotfileModel] {

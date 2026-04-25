@@ -64,8 +64,9 @@ struct DotfileImport: ParsableCommand {
     // ── Run ───────────────────────────────────────────────────────────────────
 
     func run() throws {
-        let existing = Set(DotfileModel.loadDotfiles().map { $0.id })
-        let alreadySlugs = Set(DotfileModel.loadDotfiles().map { $0.link })
+        let tracked = DotfileModel.loadDotfiles()
+        let existing = Set(tracked.map { $0.id })
+        let alreadySlugs = Set(tracked.map { $0.link })
 
         // Find known dotfiles present on disk that are not yet tracked
         var seen = Set<String>()   // deduplicate by slug when multiple paths map to same slug
@@ -170,8 +171,8 @@ struct DotfileImport: ParsableCommand {
         }
 
         if isSymlink(target) {
-            let dest = try? fm.destinationOfSymbolicLink(atPath: target.path)
-            if dest == source.path {
+            let dest = symlinkDestination(at: target)
+            if dest == source.standardized.path {
                 skip("  \(dotfile.id)  \(gray)already linked\(reset)")
                 return
             }
