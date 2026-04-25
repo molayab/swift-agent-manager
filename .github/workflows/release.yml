@@ -24,11 +24,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Swift 6.2
-        uses: swift-actions/setup-swift@v2
-        with:
-          swift-version: '6.2'
-
       - name: Stamp version from tag
         run: |
           sed -i.bak "s/version: \"[^\"]*\"/version: \"${{ github.ref_name }}\"/" Sources/CLIManager/App.swift
