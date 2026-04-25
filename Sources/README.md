@@ -1,8 +1,8 @@
-# AgentManager — Architecture & Technical Reference
+# CLIManager — Architecture & Technical Reference
 
 ## Overview
 
-`agent-manager` is a Swift CLI for managing AI agent skills and slash commands across multiple code editors. It stores everything in a local git repository and synchronizes via symlinks into each agent's configuration directory.
+`cli-manager` is a Swift CLI for managing AI agent skills and slash commands across multiple code editors. It stores everything in a local git repository and synchronizes via symlinks into each agent's configuration directory.
 
 **Supported agents:** Claude Code, OpenCode, GitHub Copilot, Cursor, Codex, Gemini CLI, Windsurf
 
@@ -11,7 +11,7 @@
 ## Command Hierarchy
 
 ```
-agent-manager
+cli-manager
 ├── skill               Skill management
 │   ├── list            List all skills with activation status (default)
 │   ├── new <name>      Scaffold a new skill directory with SKILL.md
@@ -41,13 +41,13 @@ agent-manager
 
 ### Entry Point
 
-**`App.swift`** — Defines the root `AgentManager` struct using `ArgumentParser`. Version is stamped from the git tag at build time via a `Run Script` phase that rewrites `App.swift` before compilation.
+**`App.swift`** — Defines the root `CLIManager` struct using `ArgumentParser`. Version is stamped from the git tag at build time via a `Run Script` phase that rewrites `App.swift` before compilation.
 
 ```swift
-@main struct AgentManager: AsyncParsableCommand {
+@main struct CLIManager: AsyncParsableCommand {
     static var configuration = CommandConfiguration(
-        commandName: "agent-manager",
-        version: "1.0.6",
+        commandName: "cli-manager",
+        version: buildVersion,
         subcommands: [Skills.self, Commands.self, Sync.self, Repo.self, Push.self, Pull.self, Clean.self]
     )
 }
@@ -58,7 +58,7 @@ All commands inherit from `ParsableCommand` (sync) or `AsyncParsableCommand` (as
 ### Directory Layout
 
 ```
-Sources/AgentManager/
+Sources/CLIManager/
 ├── App.swift                        Entry point and root command
 ├── CLI/
 │   ├── Core/                        System-level commands
@@ -181,7 +181,7 @@ Enum providing static YAML frontmatter utilities:
 
 ### `FileManager+Helpers` (`Library/FileManager+Helpers.swift`)
 
-- `repoRoot` — resolved via: `$AGENT_MANAGER_REPO` env var → `~/.config/agent-manager/repo` config file → walk up directories for `Package.swift` → current directory
+- `repoRoot` — resolved via: `$CLI_MANAGER_REPO` env var → `~/.config/cli-manager/repo` config file → walk up directories for `Package.swift` → current directory
 - `skillsDir` — `repoRoot/skills`
 - `commandsDir` — `repoRoot/commands`
 - Custom tilde expansion avoids ObjC runtime dependency
@@ -270,10 +270,10 @@ Request settings: 15-second timeout, `Accept: application/vnd.github+json`
 ## Build & Dependencies
 
 **`Package.swift`**
-- Swift tools: 6.0
+- Swift tools: 6.1
 - Platform: macOS 13+
-- Dependencies: [`swift-argument-parser`](https://github.com/apple/swift-argument-parser) ≥ 1.5.0
-- Single executable target: `agent-manager`
+- Dependencies: [`swift-argument-parser`](https://github.com/apple/swift-argument-parser) 1.7.1 (exact)
+- Single executable target: `cli-manager`
 
 **Version stamping** — A Xcode `Run Script` build phase replaces the `version:` string in `App.swift` with the current `git describe --tags` output before compilation.
 
@@ -283,8 +283,8 @@ Request settings: 15-second timeout, `Accept: application/vnd.github+json`
 
 | Source | Description |
 |---|---|
-| `$AGENT_MANAGER_REPO` | Override the repository root path |
-| `~/.config/agent-manager/repo` | Persisted repo path written by `install.sh` |
+| `$CLI_MANAGER_REPO` | Override the repository root path |
+| `~/.config/cli-manager/repo` | Persisted repo path written by `install.py` or `cli-manager repo --init`/`--use` |
 | `$GITHUB_TOKEN` | GitHub API token for `skill install` |
 
-Binary installed to: `~/.config/agent-manager/bin/agent-manager`
+Binary installed to: `~/.config/cli-manager/bin/cli-manager`

@@ -11,7 +11,7 @@ env:
 jobs:
   build-macos:
     name: Build macos-${{ matrix.arch }}
-    runs-on: macos-15
+    runs-on: macos-latest
     strategy:
       fail-fast: false
       matrix:
@@ -26,20 +26,20 @@ jobs:
 
       - name: Stamp version from tag
         run: |
-          sed -i.bak "s/version: \"[^\"]*\"/version: \"${{ github.ref_name }}\"/" Sources/AgentManager/App.swift
-          rm -f Sources/AgentManager/App.swift.bak
+          sed -i.bak "s/let buildVersion = \"[^\"]*\"/let buildVersion = \"${{ github.ref_name }}\"/" Sources/CLIManager/BuildVersion.swift
+          rm -f Sources/CLIManager/BuildVersion.swift.bak
 
       - name: Build
-        run: swift build -c release --product agent-manager ${{ matrix.swift-args }}
+        run: swift build -c release --product cli-manager ${{ matrix.swift-args }}
 
       - name: Stage binary
-        run: cp .build/release/agent-manager agent-manager-macos-${{ matrix.arch }}
+        run: cp .build/release/cli-manager cli-manager-macos-${{ matrix.arch }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: agent-manager-macos-${{ matrix.arch }}
-          path: agent-manager-macos-${{ matrix.arch }}
+          name: cli-manager-macos-${{ matrix.arch }}
+          path: cli-manager-macos-${{ matrix.arch }}
 
   build-linux:
     name: Build linux-${{ matrix.arch }}
@@ -59,20 +59,20 @@ jobs:
 
       - name: Stamp version from tag
         run: |
-          sed -i.bak "s/version: \"[^\"]*\"/version: \"${{ github.ref_name }}\"/" Sources/AgentManager/App.swift
-          rm -f Sources/AgentManager/App.swift.bak
+          sed -i.bak "s/let buildVersion = \"[^\"]*\"/let buildVersion = \"${{ github.ref_name }}\"/" Sources/CLIManager/BuildVersion.swift
+          rm -f Sources/CLIManager/BuildVersion.swift.bak
 
       - name: Build
-        run: swift build -c release --product agent-manager
+        run: swift build -c release --product cli-manager
 
       - name: Stage binary
-        run: cp .build/release/agent-manager agent-manager-linux-${{ matrix.arch }}
+        run: cp .build/release/cli-manager cli-manager-linux-${{ matrix.arch }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: agent-manager-linux-${{ matrix.arch }}
-          path: agent-manager-linux-${{ matrix.arch }}
+          name: cli-manager-linux-${{ matrix.arch }}
+          path: cli-manager-linux-${{ matrix.arch }}
 
   release:
     name: Publish GitHub Release
@@ -90,5 +90,5 @@ jobs:
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
-          files: agent-manager-*
+          files: cli-manager-*
           generate_release_notes: true

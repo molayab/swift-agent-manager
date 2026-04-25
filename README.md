@@ -1,12 +1,12 @@
-# agent-manager
+# cli-manager
 
 Manage AI agent skills and slash commands across every tool and machine from a single git repository.
 
 [![Platform](https://img.shields.io/badge/platform-macOS%2013%2B%20%7C%20Linux-lightgrey)](https://www.swift.org/)
 [![Swift](https://img.shields.io/badge/Swift-6.2-orange)](https://www.swift.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
-[![CI](https://github.com/molayab/swift-agent-manager/actions/workflows/ci.yml/badge.svg)](https://github.com/molayab/swift-agent-manager/actions/workflows/ci.yml)
-[![Release](https://github.com/molayab/swift-agent-manager/actions/workflows/release.yml/badge.svg)](https://github.com/molayab/swift-agent-manager/actions/workflows/release.yml)
+[![CI](https://github.com/molayab/swift-cli-manager/actions/workflows/ci.yml/badge.svg)](https://github.com/molayab/swift-cli-manager/actions/workflows/ci.yml)
+[![Release](https://github.com/molayab/swift-cli-manager/actions/workflows/release.yml/badge.svg)](https://github.com/molayab/swift-cli-manager/actions/workflows/release.yml)
 
 ---
 
@@ -17,7 +17,7 @@ Modern development involves several AI coding agents — OpenCode, Claude Code, 
 - Nothing is versioned, so configuration is lost when you reformat or switch machines
 - There is no way to share useful prompts with teammates or the community
 
-`agent-manager` fixes this with a single git repo as the source of truth. Skills and commands live here. The tool creates symlinks into each agent's configuration directory so every agent picks them up. Update a file once — every agent sees the change.
+`cli-manager` fixes this with a single git repo as the source of truth. Skills and commands live here. The tool creates symlinks into each agent's configuration directory so every agent picks them up. Update a file once — every agent sees the change.
 
 ---
 
@@ -58,21 +58,21 @@ Modern development involves several AI coding agents — OpenCode, Claude Code, 
 ### Option A — one-liner (no clone required)
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/molayab/swift-agent-manager/main/quickinstall.py | python3
+curl -fsSL https://raw.githubusercontent.com/molayab/swift-cli-manager/main/quickinstall.py | python3
 ```
 
 The script sets up everything from scratch — no existing repo or Swift toolchain needed:
 
 1. Downloads the pre-compiled binary for your platform
-2. Creates an **empty repo** at `~/.config/agent-manager/src/` with `skills/`, `commands/`, and a `.gitignore`
+2. Creates an **empty repo** at `~/.config/cli-manager/src/` with `skills/`, `commands/`, `dotfiles/`, and a `.gitignore`
 3. Runs `git init` and makes an initial commit (skipped if the directory is already a git repo)
-4. Installs the binary to `~/.config/agent-manager/src/bin/`
-5. Writes `~/.config/agent-manager/repo` so the binary knows where your repo lives
+4. Installs the binary to `~/.config/cli-manager/src/bin/`
+5. Writes `~/.config/cli-manager/repo` so the binary knows where your repo lives
 
 After install, add your skills and commands, then push to your own remote whenever you're ready:
 
 ```sh
-cd ~/.config/agent-manager/src
+cd ~/.config/cli-manager/src
 git remote add origin https://github.com/<you>/my-agents.git
 git push -u origin main
 ```
@@ -81,13 +81,13 @@ git push -u origin main
 
 ```sh
 # Install binary to /usr/local/bin as well
-curl -fsSL https://raw.githubusercontent.com/molayab/swift-agent-manager/main/quickinstall.py | python3 - --global
+curl -fsSL https://raw.githubusercontent.com/molayab/swift-cli-manager/main/quickinstall.py | python3 - --global
 
 # Pin to a specific release
-curl -fsSL https://raw.githubusercontent.com/molayab/swift-agent-manager/main/quickinstall.py | python3 - --version 1.0.5 --global
+curl -fsSL https://raw.githubusercontent.com/molayab/swift-cli-manager/main/quickinstall.py | python3 - --version 1.0.5 --global
 
 # Custom repo directory
-curl -fsSL https://raw.githubusercontent.com/molayab/swift-agent-manager/main/quickinstall.py | python3 - --dir ~/my-agents
+curl -fsSL https://raw.githubusercontent.com/molayab/swift-cli-manager/main/quickinstall.py | python3 - --dir ~/my-agents
 ```
 
 ### Option B — clone and install
@@ -95,8 +95,8 @@ curl -fsSL https://raw.githubusercontent.com/molayab/swift-agent-manager/main/qu
 Clone your fork (or this repo), then choose how to build or download:
 
 ```sh
-git clone https://github.com/<you>/agent-manager ~/agent-manager
-cd ~/agent-manager
+git clone https://github.com/<you>/cli-manager ~/cli-manager
+cd ~/cli-manager
 ```
 
 **Download a pre-compiled binary** (no Swift toolchain required):
@@ -114,22 +114,22 @@ python3 install.py            # install to ./bin/
 python3 install.py --global   # install to /usr/local/bin
 ```
 
-Examples throughout this README assume a global install. If you installed locally, replace `agent-manager` with `./bin/agent-manager`.
+Examples throughout this README assume a global install. If you installed locally, replace `cli-manager` with `./bin/cli-manager`.
 
 ### How the binary locates the repo
 
-After a successful install, `install.py` writes the repo path to `~/.config/agent-manager/repo`. The binary reads this file at runtime so it always knows where `skills/` and `commands/` live, regardless of your working directory.
+After a successful install, `install.py` writes the repo path to `~/.config/cli-manager/repo`. The binary reads this file at runtime so it always knows where `skills/` and `commands/` live, regardless of your working directory.
 
 Resolution order:
 
-1. `AGENT_MANAGER_REPO` environment variable — useful in CI or when managing multiple repos
-2. `~/.config/agent-manager/repo` — written automatically by `install.py`
+1. `CLI_MANAGER_REPO` environment variable — useful in CI or when managing multiple repos
+2. `~/.config/cli-manager/repo` — written automatically by `install.py`
 3. Walk up from the current directory looking for `Package.swift` — fallback for `swift run` / development
 
-If you ever move the repo, re-run `install.py` to update the config file, or set `AGENT_MANAGER_REPO` to the new path:
+If you ever move the repo, re-run `install.py` to update the config file, or set `CLI_MANAGER_REPO` to the new path:
 
 ```sh
-export AGENT_MANAGER_REPO=~/new-location/agent-manager
+export CLI_MANAGER_REPO=~/new-location/cli-manager
 ```
 
 ---
@@ -138,18 +138,18 @@ export AGENT_MANAGER_REPO=~/new-location/agent-manager
 
 ```sh
 # Symlink all skills into every detected agent
-agent-manager skill activate
+cli-manager skill activate
 
 # Symlink all slash commands into every detected agent
-agent-manager command activate
+cli-manager command activate
 ```
 
 Both commands detect which agents are installed on your machine and only target those. Use flags to narrow scope:
 
 ```sh
-agent-manager skill activate -a opencode        # one agent
-agent-manager skill activate -s swiftui-pro     # one skill
-agent-manager skill activate --dry-run          # preview without making changes
+cli-manager skill activate -a opencode        # one agent
+cli-manager skill activate -s swiftui-pro     # one skill
+cli-manager skill activate --dry-run          # preview without making changes
 ```
 
 ---
@@ -159,7 +159,7 @@ agent-manager skill activate --dry-run          # preview without making changes
 ```
 skills/      ← skill context files, one directory per skill
 commands/    ← slash command markdown files
-Sources/     ← Swift CLI source (the agent-manager binary)
+Sources/     ← Swift CLI source (the cli-manager binary)
 ```
 
 ---
@@ -169,15 +169,15 @@ Sources/     ← Swift CLI source (the agent-manager binary)
 Scaffold a new file, edit it, then activate:
 
 ```sh
-agent-manager skill new "my-skill"     # creates skills/my-skill/SKILL.md
-agent-manager command new "deploy"     # creates commands/deploy.md
+cli-manager skill new "my-skill"     # creates skills/my-skill/SKILL.md
+cli-manager command new "deploy"     # creates commands/deploy.md
 ```
 
 After editing the generated file:
 
 ```sh
-agent-manager skill activate -s my-skill
-agent-manager command activate -c deploy
+cli-manager skill activate -s my-skill
+cli-manager command activate -c deploy
 ```
 
 ---
@@ -188,23 +188,23 @@ Any public GitHub repository that follows the `skills/<name>/SKILL.md` layout wo
 
 ```sh
 # Interactive picker — browse the full remote catalogue
-agent-manager skill install rudrankriyam/app-store-connect-cli-skills
+cli-manager skill install rudrankriyam/app-store-connect-cli-skills
 
 # Install a specific skill by name
-agent-manager skill install rudrankriyam/app-store-connect-cli-skills asc-build-lifecycle
+cli-manager skill install rudrankriyam/app-store-connect-cli-skills asc-build-lifecycle
 
 # Overwrite a skill that already exists locally
-agent-manager skill install rudrankriyam/app-store-connect-cli-skills asc-build-lifecycle --force
+cli-manager skill install rudrankriyam/app-store-connect-cli-skills asc-build-lifecycle --force
 
 # Activate after installing
-agent-manager skill activate
+cli-manager skill activate
 ```
 
 > **Rate limits** — unauthenticated GitHub API requests are limited to 60/hour. Set `GITHUB_TOKEN` in your environment to raise this limit:
 >
 > ```sh
 > export GITHUB_TOKEN=ghp_…
-> agent-manager skill install rudrankriyam/app-store-connect-cli-skills
+> cli-manager skill install rudrankriyam/app-store-connect-cli-skills
 > ```
 
 ---
@@ -214,9 +214,9 @@ agent-manager skill activate
 Copy `.md` command files from agent directories on your machine into the repo's `commands/` folder, so they can be versioned and activated across all agents:
 
 ```sh
-agent-manager command import              # interactive picker
-agent-manager command import -a opencode  # specific agent only
-agent-manager command import --force      # overwrite existing files
+cli-manager command import              # interactive picker
+cli-manager command import -a opencode  # specific agent only
+cli-manager command import --force      # overwrite existing files
 ```
 
 Only markdown-format agents are supported (OpenCode, Claude Code, Windsurf). TOML-based agents such as Gemini CLI are skipped.
@@ -248,15 +248,15 @@ The `skill private` and `command private` subcommands toggle a file between priv
 
 ```sh
 # Make a skill private (git-ignored)
-agent-manager skill private swiftui-pro
+cli-manager skill private swiftui-pro
 # skills/swiftui-pro/ → skills/swiftui-pro.private/
 
 # Make a command private (git-ignored)
-agent-manager command private commit
+cli-manager command private commit
 # commands/commit.md → commands/commit.private.md
 
 # Toggle back to public
-agent-manager skill private swiftui-pro
+cli-manager skill private swiftui-pro
 ```
 
 You can also create private files directly using the `.private` naming convention — no toggle step required.
@@ -266,16 +266,16 @@ You can also create private files directly using the `.private` naming conventio
 ## Syncing Across Machines
 
 ```sh
-agent-manager push -m "add deploy command"   # stage all changes, commit, and push
-agent-manager pull                           # pull latest on another machine
-agent-manager clean                          # remove dead symlinks
+cli-manager push -m "add deploy command"   # stage all changes, commit, and push
+cli-manager pull                           # pull latest on another machine
+cli-manager clean                          # remove dead symlinks
 ```
 
 `clean` is useful after deleting, renaming, or moving skills and commands. It scans every known agent directory and removes any symlink whose target no longer exists:
 
 ```sh
-agent-manager clean           # remove dead symlinks
-agent-manager clean --dry-run # preview without removing
+cli-manager clean           # remove dead symlinks
+cli-manager clean --dry-run # preview without removing
 ```
 
 ---

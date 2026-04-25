@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
-"""agent-manager quick installer
+"""cli-manager quick installer
 
 Downloads a pre-compiled binary and creates a ready-to-use repo.
 No Swift toolchain required.
 
 Usage (one-liner):
-  curl -fsSL https://raw.githubusercontent.com/molayab/swift-agent-manager/main/quickinstall.py | python3
+  curl -fsSL https://raw.githubusercontent.com/molayab/swift-cli-manager/main/quickinstall.py | python3
 
 With options:
   python3 quickinstall.py [--dir <path>] [--global] [--version <tag>]
 
 Options:
-  --dir <path>      Where to create the repo  (default: ~/.config/agent-manager/src)
+  --dir <path>      Where to create the repo  (default: ~/.config/cli-manager/src)
   --global          Also install the binary to /usr/local/bin
   --version <tag>   Pin to a specific release tag (default: latest)
 """
@@ -27,7 +27,7 @@ import tempfile
 import urllib.request
 from pathlib import Path
 
-GITHUB_REPO = "molayab/swift-agent-manager"
+GITHUB_REPO = "molayab/swift-cli-manager"
 
 GITIGNORE_CONTENT = """\
 # Local binary (installed by quickinstall.py / install.py)
@@ -36,9 +36,10 @@ bin/
 # macOS
 .DS_Store
 
-# Private skills and commands (local only, never committed)
+# Private skills, commands, and dotfiles (local only, never committed)
 skills/*.private/
 commands/*.private.md
+dotfiles/*.private/
 """
 
 # ── Terminal colours ───────────────────────────────────────────────────────────
@@ -76,14 +77,14 @@ def info(msg: str) -> None:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="agent-manager quick installer",
+        description="cli-manager quick installer",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument(
         "--dir",
-        default=str(Path.home() / ".config" / "agent-manager" / "src"),
+        default=str(Path.home() / ".config" / "cli-manager" / "src"),
         metavar="PATH",
-        help="Where to create the repo (default: ~/.config/agent-manager/src)",
+        help="Where to create the repo (default: ~/.config/cli-manager/src)",
     )
     parser.add_argument(
         "--global",
@@ -162,7 +163,7 @@ def download_binary(url: str, dest: Path) -> None:
 def create_repo_structure(install_dir: Path) -> None:
     info(f"Creating repo at {BOLD}{install_dir}{RESET}")
 
-    for subdir in ("skills", "commands", "bin"):
+    for subdir in ("skills", "commands", "dotfiles", "bin"):
         (install_dir / subdir).mkdir(parents=True, exist_ok=True)
 
     gitignore = install_dir / ".gitignore"
@@ -185,12 +186,12 @@ def create_repo_structure(install_dir: Path) -> None:
 def install_binary(src: Path, install_dir: Path, global_install: bool) -> None:
     global_bin = Path("/usr/local/bin")
 
-    local_dest = install_dir / "bin" / "agent-manager"
+    local_dest = install_dir / "bin" / "cli-manager"
     shutil.copy2(src, local_dest)
     local_dest.chmod(0o755)
 
     if global_install:
-        global_dest = global_bin / "agent-manager"
+        global_dest = global_bin / "cli-manager"
         if os.access(global_bin, os.W_OK):
             shutil.copy2(src, global_dest)
             global_dest.chmod(0o755)
@@ -204,10 +205,10 @@ def install_binary(src: Path, install_dir: Path, global_install: bool) -> None:
 # ── Config ─────────────────────────────────────────────────────────────────────
 
 def write_repo_config(install_dir: Path) -> None:
-    config_dir = Path.home() / ".config" / "agent-manager"
+    config_dir = Path.home() / ".config" / "cli-manager"
     config_dir.mkdir(parents=True, exist_ok=True)
     (config_dir / "repo").write_text(str(install_dir))
-    ok(f"Repo path saved to {BOLD}~/.config/agent-manager/repo{RESET}")
+    ok(f"Repo path saved to {BOLD}~/.config/cli-manager/repo{RESET}")
 
 
 # ── Main ───────────────────────────────────────────────────────────────────────
@@ -221,10 +222,10 @@ def main() -> None:
         fail("git is required but was not found in PATH.")
 
     os_name, arch = detect_platform()
-    asset_name = f"agent-manager-{os_name}-{arch}"
+    asset_name = f"cli-manager-{os_name}-{arch}"
 
     print()
-    print(f"{BOLD}agent-manager quick install{RESET}  {GRAY}{GITHUB_REPO}{RESET}")
+    print(f"{BOLD}cli-manager quick install{RESET}  {GRAY}{GITHUB_REPO}{RESET}")
     print()
     info("Fetching release metadata…")
 
@@ -250,24 +251,24 @@ def main() -> None:
         print()
         create_repo_structure(install_dir)
         install_binary(tmp_path, install_dir, args.global_install)
-        ok(f"Installed  {GRAY}bin/agent-manager{RESET}  {GRAY}({tag_name}){RESET}")
+        ok(f"Installed  {GRAY}bin/cli-manager{RESET}  {GRAY}({tag_name}){RESET}")
         write_repo_config(install_dir)
     finally:
         tmp_path.unlink(missing_ok=True)
 
     print()
-    print(f"{BOLD}Done!{RESET}  Your agent-manager repo is at {BOLD}{install_dir}{RESET}")
+    print(f"{BOLD}Done!{RESET}  Your cli-manager repo is at {BOLD}{install_dir}{RESET}")
     print()
 
     if args.global_install:
-        info(f"Run: {BOLD}agent-manager skill activate{RESET}")
+        info(f"Run: {BOLD}cli-manager skill activate{RESET}")
     else:
         info(f"Add {BOLD}{install_dir / 'bin'}{RESET} to your PATH, or run directly:")
-        info(f"  {BOLD}{install_dir / 'bin' / 'agent-manager'} skill activate{RESET}")
+        info(f"  {BOLD}{install_dir / 'bin' / 'cli-manager'} skill activate{RESET}")
 
     info("To push to your own remote:")
     info(
-        f"  cd ~/.config/agent-manager/src && "
+        f"  cd ~/.config/cli-manager/src && "
         "git remote add origin <your-repo-url> && git push -u origin main"
     )
     print()
